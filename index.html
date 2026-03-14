@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Hospital Appointment Support Agent | Professional Challenge Brief</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #0f1421;
+            --bg-card: rgba(15, 20, 33, 0.7);
+            --cyan: #00d4ff;
+            --purple: #6c63ff;
+            --green: #00ff88;
+            --red: #ff4757;
+            --orange: #ffa502;
+            --text-primary: #e4e9f0;
+            --text-secondary: #8892a6;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0d1117 50%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sticky Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--cyan);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 2rem 4rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header-icon {
+            font-size: 4rem;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, var(--cyan), var(--purple), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
+        .header-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Skills Bar */
+        .skills-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0 3rem;
+            animation: fadeIn 1s ease 0.3s both;
+        }
+
+        .skill-tag {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--cyan);
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 30px rgba(0, 212, 255, 0.4);
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            font-weight: 800;
+            font-size: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--cyan);
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .card h3 {
+            color: var(--cyan);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p, .card li {
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+        }
+
+        .card ul {
+            padding-left: 1.5rem;
+        }
+
+        /* Platform Badge */
+        .platform-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(0, 212, 255, 0.2));
+            border: 2px solid var(--purple);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 0 30px rgba(108, 99, 255, 0.4);
+            margin: 1.5rem 0;
+        }
+
+        /* Quote Block */
+        .quote-block {
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 4px solid var(--cyan);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 8px;
+            color: var(--cyan);
+            font-size: 0.95rem;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .grid-item {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .grid-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .grid-item h4 {
+            color: var(--cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Subsection Labels */
+        .subsection-label {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* NEW: Browser Mockup */
+        .browser-mockup {
+            background: rgba(15, 20, 33, 0.8);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+            margin: 2rem 0;
+        }
+
+        .browser-chrome {
+            background: rgba(20, 25, 40, 0.9);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .browser-dot.red { background: var(--red); }
+        .browser-dot.orange { background: var(--orange); }
+        .browser-dot.green { background: var(--green); }
+
+        .browser-url {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .browser-content {
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, rgba(10, 14, 26, 0.95) 0%, rgba(15, 20, 33, 0.95) 100%);
+        }
+
+        .landing-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .landing-hero h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .landing-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(0, 212, 255, 0.8); }
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 50px rgba(0, 212, 255, 0.8);
+        }
+
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card h4 {
+            color: var(--cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-bar {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(0, 212, 255, 0.2));
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            text-align: center;
+            border: 1px solid var(--purple);
+        }
+
+        .stat-item {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+            animation: pulse 2s infinite;
+            z-index: 999;
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .flow-node {
+            background: var(--bg-card);
+            border: 2px solid var(--cyan);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem auto;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            position: relative;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .flow-node.decision {
+            border-color: var(--purple);
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 20px;
+            transform: rotate(0deg) skewX(-5deg);
+            padding: 2rem 1.5rem;
+        }
+
+        .flow-node.decision-content {
+            transform: skewX(5deg);
+        }
+
+        .flow-node.success {
+            border-color: var(--green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .flow-node.branch {
+            border-color: var(--orange);
+            background: rgba(255, 165, 2, 0.1);
+            max-width: 400px;
+            display: inline-block;
+            margin: 1rem 1rem;
+        }
+
+        .flow-connector {
+            text-align: center;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .flow-arrow {
+            display: inline-block;
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(180deg, var(--cyan), transparent);
+            position: relative;
+            animation: flow-down 2s infinite;
+        }
+
+        @keyframes flow-down {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .flow-arrow::after {
+            content: '▼';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--cyan);
+            font-size: 1rem;
+        }
+
+        .flow-branches {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .flow-node-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 2rem auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .chat-tabs {
+            display: flex;
+            background: rgba(15, 20, 33, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .chat-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-right: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chat-tab:last-child {
+            border-right: none;
+        }
+
+        .chat-tab:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .chat-tab.active {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--cyan);
+            border-bottom: 3px solid var(--cyan);
+        }
+
+        .scenario-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            display: inline-block;
+            margin-bottom: 0.3rem;
+        }
+
+        .chat-messages {
+            padding: 2rem;
+            max-height: 600px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .chat-messages.active {
+            display: block;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: flex-start;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar.bot {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .chat-avatar.user-avatar {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--text-secondary);
+        }
+
+        .chat-bubble {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .chat-bubble.bot {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .chat-bubble.user {
+            background: rgba(108, 99, 255, 0.2);
+            border: 1px solid rgba(108, 99, 255, 0.4);
+        }
+
+        .chat-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 0.4rem;
+            padding: 1rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--cyan);
+            border-radius: 50%;
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Comparison Table */
+        .comparison-table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .comparison-table th {
+            background: rgba(15, 20, 33, 0.9);
+            padding: 1.5rem;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        .comparison-table th:nth-child(2) {
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.1);
+            position: relative;
+        }
+
+        .comparison-table th:nth-child(2)::before {
+            content: '👑';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .comparison-table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comparison-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .comparison-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .comparison-table td:nth-child(2) {
+            background: rgba(0, 212, 255, 0.05);
+            font-weight: 600;
+            color: var(--cyan);
+        }
+
+        .comparison-table td:nth-child(3) {
+            color: var(--text-secondary);
+        }
+
+        .table-icon {
+            margin-right: 0.5rem;
+        }
+
+        .winner-badge {
+            text-align: center;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2));
+            border: 2px solid var(--cyan);
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .comparison-stats {
+            display: flex;
+            justify-content: space-around;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .comparison-stat {
+            flex: 1;
+            min-width: 200px;
+            padding: 1.5rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--green);
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: var(--green);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 100px 1rem 2rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                font-size: 0.8rem;
+                gap: 1rem;
+            }
+
+            .chat-bubble {
+                max-width: 85%;
+            }
+
+            .browser-content {
+                padding: 2rem 1rem;
+            }
+
+            .landing-hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .comparison-stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <div class="nav-logo">🏥 AI Hospital Agent</div>
+            <div class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#objective">Objective</a>
+                <a href="#platform">Platform</a>
+                <a href="#dataset">Dataset</a>
+                <a href="#requirements">Requirements</a>
+                <a href="#mockup">Mockup</a>
+                <a href="#userflow">User Flow</a>
+                <a href="#demo">Demo</a>
+                <a href="#comparison">Comparison</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-icon">🏥</div>
+            <h1>AI Hospital Appointment Support Agent</h1>
+            <p class="header-subtitle">Professional Challenge Brief | n8n Automation Platform</p>
+            
+            <div class="skills-bar">
+                <span class="skill-tag">🤖 AI Integration</span>
+                <span class="skill-tag">💬 Prompt Engineering</span>
+                <span class="skill-tag">⚙️ Automation Workflows</span>
+                <span class="skill-tag">📊 Data-Based Responses</span>
+                <span class="skill-tag">🧩 Problem Solving</span>
+                <span class="skill-tag">🔗 n8n Platform</span>
+            </div>
+        </header>
+
+        <!-- Section 1: Overview -->
+        <section class="section" id="overview">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">Overview</h2>
+            </div>
+            <div class="card">
+                <p>Participants are required to build an <strong>AI-powered Hospital Appointment Support Agent</strong> using the <strong>n8n automation platform</strong>.</p>
+                <p>The purpose of this agent is to assist patients by:</p>
+                <ul>
+                    <li>Answering hospital services and doctor-related inquiries</li>
+                    <li>Helping them book appointments efficiently</li>
+                    <li>Providing instant, accurate information from a verified dataset</li>
+                </ul>
+                <p>The AI agent must <strong>strictly follow the rules</strong> and respond only based on the <strong>provided hospital dataset</strong>.</p>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Challenge Focus Areas</h3>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>🤖 AI Integration</h4>
+                        <p>Seamless LLM API integration</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>💬 Prompt Engineering</h4>
+                        <p>Dataset-restricted responses</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>⚙️ Automation Workflows</h4>
+                        <p>n8n workflow design</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>📊 Data-Based Responses</h4>
+                        <p>Accurate information retrieval</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🧩 Problem-Solving</h4>
+                        <p>Edge case handling</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🔒 Security</h4>
+                        <p>Misuse prevention</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Task Objective -->
+        <section class="section" id="objective">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">Task Objective</h2>
+            </div>
+            <div class="card">
+                <h3>🎯 Development Goals</h3>
+                <p>Participants must develop an <strong>AI Hospital Support Agent</strong> that:</p>
+                <ul>
+                    <li>✅ Answers hospital service and doctor-related queries accurately</li>
+                    <li>✅ Uses <strong>only the provided dataset</strong> for all responses</li>
+                    <li>✅ Maintains a <strong>professional and polite tone</strong> at all times</li>
+                    <li>✅ Collects appointment information from interested patients</li>
+                    <li>✅ Prevents data manipulation and misuse attempts</li>
+                    <li>✅ Handles edge cases gracefully with appropriate fallback messages</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section 3: Platform Requirement -->
+        <section class="section" id="platform">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">Platform Requirement</h2>
+            </div>
+            <div class="card">
+                <h3>🛠️ Required Platform</h3>
+                <div class="platform-badge">
+                    ⚙️ n8n (Workflow Automation Platform)
+                </div>
+                
+                <h3 style="margin-top: 2rem;">🔗 Allowed Integrations</h3>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>🤖 LLM APIs</h4>
+                        <p>OpenAI, Gemini, or other AI models</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>📊 Data Storage</h4>
+                        <p>Google Sheets, Notion, or Database</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🌐 Interface</h4>
+                        <p>Webhook or Chat Interface</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Dataset -->
+        <section class="section" id="dataset">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">Dataset Requirements</h2>
+            </div>
+            <div class="card">
+                <h3>📋 Hospital Dataset Structure</h3>
+                <p>Each participant/team will create or upload a <strong>hospital dataset</strong> containing information such as:</p>
+                
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>👨‍⚕️ Doctor Name</h4>
+                        <p>Full name of medical professionals</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🩺 Specialization</h4>
+                        <p>Medical field of expertise</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>📅 Available Days</h4>
+                        <p>Weekly availability schedule</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>💰 Consultation Fee</h4>
+                        <p>Fee structure per appointment</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>🏥 Hospital Department</h4>
+                        <p>Department assignment</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>⚕️ Services Provided</h4>
+                        <p>Specific medical services</p>
+                    </div>
+                </div>
+
+                <div class="quote-block" style="margin-top: 2rem;">
+                    ⚠️ The AI agent must only answer questions <strong>based on this dataset</strong>.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Functional Requirements -->
+        <section class="section" id="requirements">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2 class="section-title">Functional Requirements</h2>
+            </div>
+
+            <!-- 5.1 Data-Restricted Responses -->
+            <div class="card">
+                <span class="subsection-label">5.1</span>
+                <h3>🔒 Data-Restricted Responses</h3>
+                <p>The AI agent must:</p>
+                <ul>
+                    <li>✅ Provide answers <strong>only from the provided dataset</strong></li>
+                    <li>✅ Not generate or assume information beyond the dataset</li>
+                    <li>✅ Never fabricate doctor names, fees, or availability</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem;"><strong>If information is not available, respond politely:</strong></p>
+                <div class="quote-block">
+                    "I apologize, but I can only provide information based on the available hospital data. For further details, please contact our hospital reception."
+                </div>
+            </div>
+
+            <!-- 5.2 Professional Tone -->
+            <div class="card">
+                <span class="subsection-label">5.2</span>
+                <h3>🎩 Professional Tone</h3>
+                <p>All responses must be:</p>
+                <ul>
+                    <li>✅ <strong>Formal</strong> — Using proper language and grammar</li>
+                    <li>✅ <strong>Professional</strong> — Maintaining healthcare industry standards</li>
+                    <li>✅ <strong>Polite</strong> — Courteous and empathetic communication</li>
+                </ul>
+            </div>
+
+            <!-- 5.3 Misuse Protection -->
+            <div class="card">
+                <span class="subsection-label">5.3</span>
+                <h3>🛡️ Misuse Protection</h3>
+                <p>If a user tries to:</p>
+                <ul>
+                    <li>❌ Ask unrelated questions (e.g., weather, recipes, jokes)</li>
+                    <li>❌ Modify doctor or service information</li>
+                    <li>❌ Perform actions outside the agent's scope</li>
+                    <li>❌ Misuse the chatbot (spam, offensive language)</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem;"><strong>The agent must respond:</strong></p>
+                <div class="quote-block">
+                    "For further assistance, please contact our hospital reception at: [Phone Number]"
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW SECTION A: Landing Page Mockup -->
+        <section class="section" id="mockup">
+            <div class="section-header">
+                <div class="section-number">🖥️</div>
+                <h2 class="section-title">Landing Page Design Mockup</h2>
+            </div>
+            <div class="card">
+                <h3>🎨 Visual Preview</h3>
+                <p>Below is a mockup of the AI Hospital Appointment Support Agent landing page:</p>
+
+                <div class="browser-mockup">
+                    <div class="browser-chrome">
+                        <div class="browser-dots">
+                            <span class="browser-dot red"></span>
+                            <span class="browser-dot orange"></span>
+                            <span class="browser-dot green"></span>
+                        </div>
+                        <div class="browser-url">🔒 hospital-ai-agent.com</div>
+                    </div>
+                    <div class="browser-content">
+                        <div class="landing-hero">
+                            <h2>Your AI-Powered Hospital Assistant</h2>
+                            <p>Book appointments instantly with our intelligent healthcare support system</p>
+                            <a href="#" class="cta-button">📅 Book Appointment Now</a>
+                        </div>
+
+                        <div class="feature-cards">
+                            <div class="feature-card">
+                                <div class="feature-icon">🤖</div>
+                                <h4>24/7 AI Support</h4>
+                                <p>Always available to help</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">⚡</div>
+                                <h4>Instant Booking</h4>
+                                <p>Schedule in seconds</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🔍</div>
+                                <h4>Doctor Finder</h4>
+                                <p>Find the right specialist</p>
+                            </div>
+                        </div>
+
+                        <div class="stats-bar">
+                            <div class="stat-item">500+ Doctors</div>
+                            <div class="stat-item">20+ Departments</div>
+                            <div class="stat-item">24/7 Available</div>
+                            <div class="stat-item">98% Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-widget" title="Start Chat">💬</div>
+            </div>
+        </section>
+
+        <!-- NEW SECTION B: User Flow Diagram -->
+        <section class="section" id="userflow">
+            <div class="section-header">
+                <div class="section-number">🔄</div>
+                <h2 class="section-title">User Flow Diagram</h2>
+            </div>
+            <div class="card">
+                <h3>📊 Patient Appointment Booking Journey</h3>
+                <p>Complete flow from initial contact to appointment confirmation:</p>
+
+                <div class="flow-diagram">
+                    <!-- Start -->
+                    <div class="flow-node">
+                        <div class="flow-node-icon">🚀</div>
+                        <strong>START</strong><br>
+                        Patient Opens Chat
+                    </div>
+
+                    <div class="flow-connector"><div class="flow-arrow"></div></div>
+
+                    <!-- AI Greeting -->
+                    <div class="flow-node">
+                        <div class="flow-node-icon">👋</div>
+                        <strong>AI Greeting & Intent Detection</strong><br>
+                        Welcome message and analyze patient needs
+                    </div>
+
+                    <div class="flow-connector"><div class="flow-arrow"></div></div>
+
+                    <!-- Decision Point -->
+                    <div class="flow-node decision">
+                        <div class="decision-content">
+                            <div class="flow-node-icon">🔀</div>
+                            <strong>What does the patient need?</strong>
+                        </div>
+                    </div>
+
+                    <div class="flow-connector"><div class="flow-arrow"></div></div>
+
+                    <!-- Branches -->
+                    <div class="flow-branches">
+                        <div class="flow-node branch">
+                            <div class="flow-node-icon">👨‍⚕️</div>
+                            <strong>Branch 1: Doctor Inquiry</strong><br>
+                            Show Doctor List from Dataset<br>
+                            → Patient Selects Doctor
+                        </div>
+                        <div class="flow-node branch">
+                            <div class="flow-node-icon">⚕️</div>
+                            <strong>Branch 2: Service Inquiry</strong><br>
+                            Show Available Services<br>
+                            → Patient Chooses Service
+                        </div>
+                        <div class="flow-node branch">
+                            <div class="flow-node-icon">📅</div>
+                            <strong>Branch 3: Book Appointment</strong><br>
+                            Collect Patient Info<br>
+                            (Name, Date, Time, Contact)
+                        </div>
+                    </div>
+
+                    <div class="flow-connector"><div class="flow-arrow"></div></div>
+
+                    <!-- Confirm Availability -->
+                    <div class="flow-node">
+                        <div class="flow-node-icon">🔍</div>
+                        <strong>Confirm Availability</strong><br>
+                        Check doctor's schedule in dataset
+                    </div>
+
+                    <div class="flow-connector"><div class="flow-arrow"></div></div>
+
+                    <!-- Decision: Available? -->
+                    <div class="flow-node decision">
+                        <div class="decision-content">
+                            <div class="flow-node-icon">❓</div>
+                            <strong>Slot Available?</strong>
+                        </div>
+                    </div>
+
+                    <div class="flow-connector"><div class="flow-arrow"></div></div>
+
+                    <!-- YES Path -->
+                    <div class="flow-node success">
+                        <div class="flow-node-icon">✅</div>
+                        <strong>YES: Generate Booking Confirmation</strong><br>
+                        Create confirmation → Send to patient → END
+                    </div>
+
+                    <div style="text-align: center; margin: 2rem 0; color: var(--text-secondary);">
+                        <strong>OR</strong>
+                    </div>
+
+                    <!-- NO Path -->
+                    <div class="flow-node" style="border-color: var(--orange); background: rgba(255, 165, 2, 0.1);">
+                        <div class="flow-node-icon">🔄</div>
+                        <strong>NO: Suggest Alternative Slots</strong><br>
+                        Patient Selects Alternative → Loop back to confirmation
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW SECTION C: Demo Conversation Script -->
+        <section class="section" id="demo">
+            <div class="section-header">
+                <div class="section-number">💬</div>
+                <h2 class="section-title">Demo Conversation Script</h2>
+            </div>
+            <div class="card">
+                <h3>🎭 Real-World Interaction Examples</h3>
+                <p>See how the AI agent handles different patient scenarios:</p>
+
+                <div class="chat-container">
+                    <!-- Tabs -->
+                    <div class="chat-tabs">
+                        <div class="chat-tab active" onclick="switchTab(0)">
+                            <div class="scenario-badge">SCENARIO 1</div>
+                            <div>Doctor Inquiry</div>
+                        </div>
+                        <div class="chat-tab" onclick="switchTab(1)">
+                            <div class="scenario-badge">SCENARIO 2</div>
+                            <div>Misuse Attempt</div>
+                        </div>
+                        <div class="chat-tab" onclick="switchTab(2)">
+                            <div class="scenario-badge">SCENARIO 3</div>
+                            <div>Appointment Booking</div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 1: Doctor Inquiry -->
+                    <div class="chat-messages active" id="scenario-0">
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    Hello, I need to see a cardiologist. Do you have one available?
+                                </div>
+                                <div class="chat-timestamp">10:23 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot">
+                                    Good day! Welcome to City General Hospital's AI Support. Yes, we have Dr. Sarah Mitchell, our Cardiologist, available on Monday, Wednesday, and Friday. Consultation fee is $80. Would you like to book an appointment?
+                                </div>
+                                <div class="chat-timestamp">10:23 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    Yes please, what time slots are available?
+                                </div>
+                                <div class="chat-timestamp">10:24 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot">
+                                    Dr. Mitchell is available at 9:00 AM, 11:00 AM, and 2:00 PM on her available days. Which slot would you prefer?
+                                </div>
+                                <div class="chat-timestamp">10:24 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div class="chat-bubble bot">
+                                <div class="typing-indicator">
+                                    <span class="typing-dot"></span>
+                                    <span class="typing-dot"></span>
+                                    <span class="typing-dot"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 2: Misuse Attempt -->
+                    <div class="chat-messages" id="scenario-1">
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    Can you change Dr. Mitchell's consultation fee to $20?
+                                </div>
+                                <div class="chat-timestamp">11:05 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot" style="border-color: var(--red); background: rgba(255, 71, 87, 0.1);">
+                                    I apologize, but I'm unable to modify any hospital records or information. For further assistance, please contact our hospital reception at: +1 (555) 234-5678
+                                </div>
+                                <div class="chat-timestamp">11:05 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    What's the weather today?
+                                </div>
+                                <div class="chat-timestamp">11:06 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot" style="border-color: var(--red); background: rgba(255, 71, 87, 0.1);">
+                                    I apologize, but I can only provide information based on the available hospital data. For further details, please contact our hospital reception.
+                                </div>
+                                <div class="chat-timestamp">11:06 AM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 3: Appointment Booking -->
+                    <div class="chat-messages" id="scenario-2">
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    I'd like to book an appointment with a pediatrician
+                                </div>
+                                <div class="chat-timestamp">2:15 PM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot">
+                                    Certainly! We have Dr. James Lee in our Pediatrics Department, available Tuesday, Thursday, and Saturday. Consultation fee: $65. May I have your full name to proceed?
+                                </div>
+                                <div class="chat-timestamp">2:15 PM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    John Smith
+                                </div>
+                                <div class="chat-timestamp">2:16 PM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot">
+                                    Thank you, John! What date and time works best for you?
+                                </div>
+                                <div class="chat-timestamp">2:16 PM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message user">
+                            <div class="chat-avatar user-avatar">👤</div>
+                            <div>
+                                <div class="chat-bubble user">
+                                    This Thursday at 10 AM
+                                </div>
+                                <div class="chat-timestamp">2:17 PM</div>
+                            </div>
+                        </div>
+
+                        <div class="chat-message">
+                            <div class="chat-avatar bot">🏥</div>
+                            <div>
+                                <div class="chat-bubble bot" style="border-color: var(--green); background: rgba(0, 255, 136, 0.1);">
+                                    Perfect! I've noted your request. Your appointment with Dr. James Lee is scheduled for Thursday at 10:00 AM. You'll receive a confirmation shortly. Is there anything else I can help you with?
+                                </div>
+                                <div class="chat-timestamp">2:17 PM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW SECTION D: Comparison Table -->
+        <section class="section" id="comparison">
+            <div class="section-header">
+                <div class="section-number">⚖️</div>
+                <h2 class="section-title">AI Agent vs Traditional Phone Support</h2>
+            </div>
+            <div class="card">
+                <h3>📊 Comprehensive Comparison Analysis</h3>
+                <p>See why AI automation outperforms traditional methods:</p>
+
+                <div class="comparison-table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>🤖 AI Agent</th>
+                                <th>📞 Traditional Phone Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Availability</strong></td>
+                                <td><span class="table-icon">✅</span> 24/7, 365 days</td>
+                                <td><span class="table-icon">⚠️</span> Business hours only (8AM–5PM)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Response Time</strong></td>
+                                <td><span class="table-icon">✅</span> Instant (&lt; 1 second)</td>
+                                <td><span class="table-icon">⚠️</span> Average wait: 8–15 minutes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Simultaneous Users</strong></td>
+                                <td><span class="table-icon">✅</span> Unlimited concurrent</td>
+                                <td><span class="table-icon">❌</span> 1 patient per agent</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Appointment Booking</strong></td>
+                                <td><span class="table-icon">✅</span> Automated & instant</td>
+                                <td><span class="table-icon">⚠️</span> Manual data entry required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Accuracy</strong></td>
+                                <td><span class="table-icon">✅</span> Dataset-verified, no errors</td>
+                                <td><span class="table-icon">⚠️</span> Human error possible</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Language Support</strong></td>
+                                <td><span class="table-icon">✅</span> Multi-language capable</td>
+                                <td><span class="table-icon">❌</span> Limited to staff language</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost Efficiency</strong></td>
+                                <td><span class="table-icon">✅</span> Low operational cost</td>
+                                <td><span class="table-icon">❌</span> High staffing costs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Patient Experience</strong></td>
+                                <td><span class="table-icon">✅</span> Consistent, 24/7</td>
+                                <td><span class="table-icon">⚠️</span> Varies by staff mood/skill</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scalability</strong></td>
+                                <td><span class="table-icon">✅</span> Infinitely scalable</td>
+                                <td><span class="table-icon">❌</span> Requires hiring more staff</td>
+                            </tr>
+                            <tr>
+                                <td><strong>After-hours Support</strong></td>
+                                <td><span class="table-icon">✅</span> Full support available</td>
+                                <td><span class="table-icon">❌</span> Voicemail only</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="winner-badge">
+                    🏆 AI AGENT WINS — The Clear Choice for Modern Healthcare
+                </div>
+
+                <div class="comparison-stats">
+                    <div class="comparison-stat">
+                        <span class="stat-number">10x</span>
+                        Faster Response
+                    </div>
+                    <div class="comparison-stat">
+                        <span class="stat-number">5x</span>
+                        More Cost Efficient
+                    </div>
+                    <div class="comparison-stat">
+                        <span class="stat-number">100%</span>
+                        Always Available
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by AI & n8n Automation | Professional Challenge Brief 2024</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">🏥 Building the Future of Healthcare Appointment Systems</p>
+        </footer>
+    </div>
+
+    <script>
+        // Section Reveal Animation on Scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Chat Tab Switching
+        function switchTab(index) {
+            // Remove active class from all tabs and messages
+            document.querySelectorAll('.chat-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.chat-messages').forEach(msg => msg.classList.remove('active'));
+
+            // Add active class to selected tab and messages
+            document.querySelectorAll('.chat-tab')[index].classList.add('active');
+            document.getElementById(`scenario-${index}`).classList.add('active');
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Chat widget click animation
+        document.querySelector('.chat-widget').addEventListener('click', function() {
+            this.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    </script>
+
+</body>
+</html>
